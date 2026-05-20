@@ -11,3 +11,4 @@ envs/
 
 Applications under `envs/production/` are picked up recursively by the Argo CD `ApplicationSet` defined in `oracle-infra` (`infra/envs/prod/k8s/helm/stacks/argocd/resources/applicationset.yaml`).
 # oracle-gitops
+# oracle-gitops
