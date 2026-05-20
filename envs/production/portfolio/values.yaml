@@ -71,7 +71,7 @@ httpRoute:
       namespace: gateway-system
       sectionName: https
   hostnames:
-    - todinho.lkgiovani.com
+    - p.lkgiovani.com
   rules:
     - matches:
         - path:

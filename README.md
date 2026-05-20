@@ -1,6 +1,6 @@
 # oracle-gitops
 
-GitOps source-of-truth for the Oracle Cloud K3s cluster, consumed by Argo CD running in [`leogues/oracle-infra`](https://github.com/leogues/oracle-infra).
+GitOps source-of-truth for the Oracle Cloud K3s cluster, consumed by Argo CD running in [`lkgiovani/oracle-infra`](https://github.com/lkgiovani/oracle-infra).
 
 ## Layout
 
