@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: controlcar-deps
+  namespace: argocd
+  annotations:
+    # Sync before controlcar-api (RESEARCH Pitfall 7): the api's Redis/
+    # RabbitMQ clients dial synchronously at boot and crash-loop if these
+    # deps aren't Ready yet.
+    argocd.argoproj.io/sync-wave: "-1"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io/background
+spec:
+  destination:
+    namespace: production
+    server: https://kubernetes.default.svc
+  project: oracle-environments
+  source:
+    repoURL: https://github.com/lkgiovani/oracle-gitops.git
+    targetRevision: main
+    path: envs/production/controlcar-deps/manifests
+  syncPolicy:
+    automated:
+      allowEmpty: false
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - Validate=true
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
