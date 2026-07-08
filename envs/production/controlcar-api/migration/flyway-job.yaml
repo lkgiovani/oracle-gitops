@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: controlcar-api-migrate
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: flyway
+          image: flyway/flyway:11
+          args:
+            - -url=jdbc:postgresql://controlcar-postgres-rw.database.svc:5432/controlcar
+            - -user=$(DB_USER)
+            - -password=$(DB_PASSWORD)
+            - -connectRetries=10
+            - -placeholders.admin_email=$(SEED_ADMIN_EMAIL)
+            - -placeholders.admin_password=$(SEED_ADMIN_PASSWORD)
+            - migrate
+          # Seed-admin (Pitfall 5) e credenciais de DB vivem SOMENTE neste
+          # secret, dedicado ao Job efemero de migration - o Deployment de
+          # longa duracao da api usa um secret totalmente separado e nunca
+          # le SEED_ADMIN_EMAIL/SEED_ADMIN_PASSWORD nem DB_USER/DB_PASSWORD.
+          envFrom:
+            - secretRef:
+                name: controlcar-migration-secret
+          volumeMounts:
+            - name: sql
+              mountPath: /flyway/sql
+      volumes:
+        - name: sql
+          configMap:
+            name: controlcar-migrations

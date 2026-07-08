@@ -1,0 +1,38 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: production
+
+resources:
+  - configmap-env.yaml
+  - flyway-job.yaml
+
+# Espelha backend/migrations/*.sql (Pitfall 6 - o repo oracle-gitops nao
+# enxerga o repo backend, e a imagem de runtime nao empacota as .sql). Sufixo
+# por content-hash: uma nova migration muda o nome do ConfigMap, forcando o
+# Argo a rodar o Job PreSync de novo. Sempre que uma nova migration entrar em
+# backend/migrations/, copiar o arquivo tambem para migration/sql/ aqui.
+configMapGenerator:
+  - name: controlcar-migrations
+    files:
+      - sql/V1__create_extensions.sql
+      - sql/V2__create_users.sql
+      - sql/V3__create_employees.sql
+      - sql/V4__create_clients.sql
+      - sql/V5__create_vehicles.sql
+      - sql/V6__create_contracts.sql
+      - sql/V7__create_maintenances.sql
+      - sql/V8__create_vehicle_documents.sql
+      - sql/V9__create_vehicle_tasks.sql
+      - sql/V10__create_files.sql
+      - sql/V11__create_client_requests.sql
+      - sql/V12__create_notifications.sql
+      - sql/V13__create_audit_logs.sql
+      - sql/V14__create_refresh_tokens.sql
+      - sql/V15__create_password_reset_tokens.sql
+      - sql/V16__seed_admin_user.sql
+      - sql/V17__add_vehicle_documents_current_idx.sql
+      - sql/V18__alter_client_requests.sql
+      - sql/V19__alter_notifications_dedup.sql
+generatorOptions:
+  disableNameSuffixHash: false
