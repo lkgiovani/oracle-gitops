@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: controlcar-rabbitmq
+  namespace: production
+  labels:
+    app.kubernetes.io/name: controlcar-rabbitmq
+    app.kubernetes.io/part-of: controlcar-deps
+spec:
+  serviceName: controlcar-rabbitmq
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: controlcar-rabbitmq
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: controlcar-rabbitmq
+        app.kubernetes.io/part-of: controlcar-deps
+    spec:
+      securityContext:
+        # UID/GID 100/101 match the "rabbitmq" system user baked into the
+        # official rabbitmq:*-alpine image. fsGroup grants the mounted PVC
+        # group-write so /var/lib/rabbitmq is writable without root chown at
+        # boot. Verify against the actual image on first sync (user_setup) —
+        # adjust here if the container fails to start with a permission error.
+        runAsNonRoot: true
+        runAsUser: 100
+        runAsGroup: 101
+        fsGroup: 101
+      containers:
+        - name: rabbitmq
+          image: rabbitmq:4-management-alpine
+          ports:
+            - name: amqp
+              containerPort: 5672
+            - name: management
+              containerPort: 15672
+          env:
+            - name: RABBITMQ_DEFAULT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-secret
+                  key: RABBITMQ_DEFAULT_USER
+            - name: RABBITMQ_DEFAULT_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-secret
+                  key: RABBITMQ_DEFAULT_PASS
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+            # readOnlyRootFilesystem left false: the image's entrypoint writes
+            # generated config/plugin state and the erlang cookie outside the
+            # PVC path (e.g. /etc/rabbitmq, /tmp) on every boot.
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 100
+            allowPrivilegeEscalation: false
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 300m
+              memory: 384Mi
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/rabbitmq
+          livenessProbe:
+            exec:
+              command:
+                - rabbitmq-diagnostics
+                - -q
+                - ping
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+                - rabbitmq-diagnostics
+                - -q
+                - ping
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            timeoutSeconds: 10
+            failureThreshold: 3
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        # Durable: unconfirmed customer emails (Fase-8 queue/DLQ) must
+        # survive pod restarts (RESEARCH Pitfall 3 / A4).
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: longhorn
+        resources:
+          requests:
+            storage: 2Gi
