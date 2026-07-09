@@ -4,7 +4,7 @@ metadata:
   name: controlcar-api
   namespace: argocd
   annotations:
-    argocd-image-updater.argoproj.io/image-list: controlcar-api=docker.io/lkgiovani/controlcar-api
+    argocd-image-updater.argoproj.io/image-list: controlcar-api=ghcr.io/lkgiovani/controlcar-api
     argocd-image-updater.argoproj.io/controlcar-api.update-strategy: semver
     argocd-image-updater.argoproj.io/controlcar-api.helm.image-name: image.repository
     argocd-image-updater.argoproj.io/controlcar-api.helm.image-tag: image.tag

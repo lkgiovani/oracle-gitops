@@ -1,7 +1,7 @@
 fullnameOverride: controlcar-front
 
 image:
-  repository: docker.io/lkgiovani/controlcar-front
+  repository: ghcr.io/lkgiovani/controlcar-front
   tag: "latest"
   pullPolicy: Always
 
