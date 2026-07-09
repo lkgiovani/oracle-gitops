@@ -82,3 +82,6 @@ httpRoute:
         - path:
             type: PathPrefix
             value: /
+
+imagePullSecrets:
+  - name: ghcr-pull
