@@ -5,10 +5,20 @@ metadata:
   namespace: argocd
   annotations:
     argocd-image-updater.argoproj.io/image-list: controlcar-api=ghcr.io/lkgiovani/controlcar-api
-    argocd-image-updater.argoproj.io/controlcar-api.update-strategy: semver
+    # newest-build (nao semver): o CI publica tags <sha40> imutaveis + latest; a
+    # sha e a fonte de verdade auditavel. allow-tags filtra so as tags de 40 hex
+    # (ignora "latest"), e newest-build escolhe a de build mais recente.
+    argocd-image-updater.argoproj.io/controlcar-api.update-strategy: newest-build
+    argocd-image-updater.argoproj.io/controlcar-api.allow-tags: "regexp:^[0-9a-f]{40}$"
+    # pacote ghcr PRIVADO: o image-updater precisa de credencial de leitura
+    # (secret dockerconfigjson no ns argocd) pra listar tags/metadata.
+    argocd-image-updater.argoproj.io/controlcar-api.pull-secret: pullsecret:argocd/ghcr-creds
     argocd-image-updater.argoproj.io/controlcar-api.helm.image-name: image.repository
     argocd-image-updater.argoproj.io/controlcar-api.helm.image-tag: image.tag
-    argocd-image-updater.argoproj.io/write-back-method: git
+    # write-back via git com deploy key SSH (write) no oracle-gitops. git-repository
+    # forca a URL SSH porque as sources do Application usam HTTPS (leitura anonima).
+    argocd-image-updater.argoproj.io/write-back-method: git:secret:argocd/git-creds
+    argocd-image-updater.argoproj.io/git-repository: git@github.com:lkgiovani/oracle-gitops.git
     argocd-image-updater.argoproj.io/write-back-target: helmvalues:/envs/production/controlcar-api/values.yaml
   finalizers:
     - resources-finalizer.argocd.argoproj.io/background

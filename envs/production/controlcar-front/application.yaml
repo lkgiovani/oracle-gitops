@@ -5,10 +5,15 @@ metadata:
   namespace: argocd
   annotations:
     argocd-image-updater.argoproj.io/image-list: controlcar-front=ghcr.io/lkgiovani/controlcar-front
-    argocd-image-updater.argoproj.io/controlcar-front.update-strategy: semver
+    # newest-build (nao semver): CI publica tags <sha40> imutaveis + latest.
+    argocd-image-updater.argoproj.io/controlcar-front.update-strategy: newest-build
+    argocd-image-updater.argoproj.io/controlcar-front.allow-tags: "regexp:^[0-9a-f]{40}$"
+    # front e publico no ghcr, mas mantemos a credencial por uniformidade.
+    argocd-image-updater.argoproj.io/controlcar-front.pull-secret: pullsecret:argocd/ghcr-creds
     argocd-image-updater.argoproj.io/controlcar-front.helm.image-name: image.repository
     argocd-image-updater.argoproj.io/controlcar-front.helm.image-tag: image.tag
-    argocd-image-updater.argoproj.io/write-back-method: git
+    argocd-image-updater.argoproj.io/write-back-method: git:secret:argocd/git-creds
+    argocd-image-updater.argoproj.io/git-repository: git@github.com:lkgiovani/oracle-gitops.git
     argocd-image-updater.argoproj.io/write-back-target: helmvalues:/envs/production/controlcar-front/values.yaml
   finalizers:
     - resources-finalizer.argocd.argoproj.io/background
