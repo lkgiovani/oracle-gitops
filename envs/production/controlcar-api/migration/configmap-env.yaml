@@ -12,4 +12,7 @@ data:
   APP_BASE_URL: https://controlcar-api.lkgiovani.com
   WEB_BASE_URL: https://controlcar.lkgiovani.com
   CORS_ALLOWED_ORIGIN: https://controlcar.lkgiovani.com
+  # Cookie CSRF compartilhado entre front e API (subdomínios de lkgiovani.com),
+  # senão o front não lê o cookie e o double-submit falha com 403 no login.
+  COOKIE_DOMAIN: .lkgiovani.com
   LOG_LEVEL: info
