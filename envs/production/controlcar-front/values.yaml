@@ -1,27 +1,22 @@
 fullnameOverride: controlcar-front
-
 image:
   repository: ghcr.io/lkgiovani/controlcar-front
-  tag: "latest"
+  tag: "96cb60a8b39f33d62dc7767c7c55907817803897"
   pullPolicy: Always
-
 service:
   port: 8080
-
 podSecurityContext:
   runAsNonRoot: true
   runAsUser: 1000
   fsGroup: 1000
-
 securityContext:
   capabilities:
     drop:
-      - ALL
+    - ALL
   readOnlyRootFilesystem: true
   runAsNonRoot: true
   runAsUser: 1000
   allowPrivilegeEscalation: false
-
 livenessProbe:
   httpGet:
     path: /
@@ -29,7 +24,6 @@ livenessProbe:
   initialDelaySeconds: 10
   periodSeconds: 15
   failureThreshold: 3
-
 readinessProbe:
   httpGet:
     path: /
@@ -37,21 +31,18 @@ readinessProbe:
   initialDelaySeconds: 5
   periodSeconds: 10
   failureThreshold: 3
-
 # nginx-unprivileged com readOnlyRootFilesystem precisa de /tmp (pid/temp)
 # e /var/cache/nginx graváveis.
 volumes:
-  - name: tmp
-    emptyDir: {}
-  - name: nginx-cache
-    emptyDir: {}
-
+- name: tmp
+  emptyDir: {}
+- name: nginx-cache
+  emptyDir: {}
 volumeMounts:
-  - name: tmp
-    mountPath: /tmp
-  - name: nginx-cache
-    mountPath: /var/cache/nginx
-
+- name: tmp
+  mountPath: /tmp
+- name: nginx-cache
+  mountPath: /var/cache/nginx
 resources:
   limits:
     cpu: 200m
@@ -59,29 +50,26 @@ resources:
   requests:
     cpu: 50m
     memory: 64Mi
-
 autoscaling:
   enabled: true
   minReplicas: 1
   maxReplicas: 2
   targetCPUUtilizationPercentage: 80
-
 # Sobe no listener wildcard existente *.lkgiovani.com (padrão portfolio):
 # sectionName: https evita casar com qualquer outro listener/apex domain
 # do Gateway compartilhado. Nenhum listener/Certificate novo é criado aqui.
 httpRoute:
   enabled: true
   parentRefs:
-    - name: default
-      namespace: gateway-system
-      sectionName: https
+  - name: default
+    namespace: gateway-system
+    sectionName: https
   hostnames:
-    - controlcar.lkgiovani.com
+  - controlcar.lkgiovani.com
   rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /
-
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
 imagePullSecrets:
-  - name: ghcr-pull
+- name: ghcr-pull
