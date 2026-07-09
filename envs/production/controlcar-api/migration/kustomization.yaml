@@ -36,3 +36,9 @@ configMapGenerator:
       - sql/V19__alter_notifications_dedup.sql
 generatorOptions:
   disableNameSuffixHash: false
+  # O Job Flyway é hook PreSync; o ConfigMap de SQL precisa existir ANTES dele.
+  # Marca o ConfigMap também como PreSync, numa wave anterior (-1) à do Job,
+  # senão o Job (wave 0) sobe antes do ConfigMap e falha com "configmap not found".
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-1"
