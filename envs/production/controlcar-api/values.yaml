@@ -13,6 +13,13 @@ service:
 # seguro sem volumes extras de /tmp.
 podSecurityContext:
   runAsNonRoot: true
+  # UID numérico: o Dockerfile usa `USER appuser` (nome), e o k8s com runAsNonRoot
+  # não consegue verificar não-root por nome — precisa de UID. O binário Go é
+  # world-executable e não escreve em disco (R2 + readOnlyRootFilesystem), então
+  # roda em qualquer UID não-zero.
+  runAsUser: 10001
+  runAsGroup: 10001
+  fsGroup: 10001
 
 securityContext:
   capabilities:
@@ -20,6 +27,7 @@ securityContext:
       - ALL
   readOnlyRootFilesystem: true
   runAsNonRoot: true
+  runAsUser: 10001
   allowPrivilegeEscalation: false
 
 env:
