@@ -1,13 +1,10 @@
 fullnameOverride: controlcar-api
-
 image:
   repository: ghcr.io/lkgiovani/controlcar-api
-  tag: "latest"
+  tag: "d9158365b8c9b492f205cfccd739356db7fb2a2d"
   pullPolicy: Always
-
 service:
   port: 3000
-
 # O binário Go roda como `appuser` (non-root) desde o Dockerfile, sem escrita
 # em disco local (arquivos vão para R2, não para volume) — readOnlyRootFilesystem
 # seguro sem volumes extras de /tmp.
@@ -20,20 +17,17 @@ podSecurityContext:
   runAsUser: 10001
   runAsGroup: 10001
   fsGroup: 10001
-
 securityContext:
   capabilities:
     drop:
-      - ALL
+    - ALL
   readOnlyRootFilesystem: true
   runAsNonRoot: true
   runAsUser: 10001
   allowPrivilegeEscalation: false
-
 env:
   configMapName: controlcar-api-config
   secretName: controlcar-api-secret
-
 # Rotas reais (health module): /healthz e /readyz — NUNCA /health.
 livenessProbe:
   httpGet:
@@ -42,7 +36,6 @@ livenessProbe:
   initialDelaySeconds: 10
   periodSeconds: 15
   failureThreshold: 3
-
 # failureThreshold generoso: a API faz dial síncrono em Redis/RabbitMQ no boot
 # (Pitfall 7) — o pod deve tolerar as deps ainda subindo sem ser reiniciado à toa.
 readinessProbe:
@@ -52,7 +45,6 @@ readinessProbe:
   initialDelaySeconds: 5
   periodSeconds: 10
   failureThreshold: 10
-
 resources:
   limits:
     cpu: 300m
@@ -60,29 +52,26 @@ resources:
   requests:
     cpu: 100m
     memory: 128Mi
-
 # D-07: mínimo de 2 réplicas para a API em produção.
 autoscaling:
   enabled: true
   minReplicas: 2
   maxReplicas: 4
   targetCPUUtilizationPercentage: 80
-
 # Sobe no listener wildcard existente *.lkgiovani.com (sectionName: https),
 # igual portfolio/controlcar-front — nenhum Gateway/Certificate novo.
 httpRoute:
   enabled: true
   parentRefs:
-    - name: default
-      namespace: gateway-system
-      sectionName: https
+  - name: default
+    namespace: gateway-system
+    sectionName: https
   hostnames:
-    - controlcar-api.lkgiovani.com
+  - controlcar-api.lkgiovani.com
   rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /
-
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
 imagePullSecrets:
-  - name: ghcr-pull
+- name: ghcr-pull
