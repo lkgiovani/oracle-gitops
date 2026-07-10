@@ -16,9 +16,9 @@ data:
   # senão o front não lê o cookie e o double-submit falha com 403 no login.
   COOKIE_DOMAIN: .lkgiovani.com
   LOG_LEVEL: info
-  # Observabilidade -> New Relic (US) via OTLP. Endpoint vazio = telemetria off (dev);
+  # Observabilidade -> New Relic (EU) via OTLP. Endpoint vazio = telemetria off (dev);
   # em prod ligamos apontando pro New Relic. A api-key (ingest) NAO vem aqui -
   # esta no Secret controlcar-api-secret (OTEL_EXPORTER_OTLP_HEADERS).
-  OTEL_EXPORTER_OTLP_ENDPOINT: https://otlp.nr-data.net
+  OTEL_EXPORTER_OTLP_ENDPOINT: https://otlp.eu01.nr-data.net
   OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
   OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE: delta
