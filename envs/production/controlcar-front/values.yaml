@@ -1,7 +1,7 @@
 fullnameOverride: controlcar-front
 image:
   repository: ghcr.io/lkgiovani/controlcar-front
-  tag: "688496d99d879a0f1727932577fcb12ced1b0abc"
+  tag: "113cb72142b69cd9a2378775c9e637f89e228d1c"
   pullPolicy: Always
 service:
   port: 8080
