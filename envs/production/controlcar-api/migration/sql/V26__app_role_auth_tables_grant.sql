@@ -1,0 +1,19 @@
+-- V26: GRANT adicional para controlcar_app nas tabelas de auth (Fase 25 D-07,
+-- RLS-live). A V21 concedeu SELECT/INSERT/UPDATE/DELETE nas 12 tabelas
+-- tenant + SELECT em companies, mas deixou de fora refresh_tokens (V14) e
+-- password_reset_tokens (V15) -- duas tabelas de auth pre-existentes que
+-- NUNCA foram tenant-scoped (nao carregam company_id, nao entram em RLS) e
+-- por isso nao apareceram na varredura da V21, focada nas 12 tabelas de
+-- negocio. Com o trafego tenant agora conectando como controlcar_app
+-- (Plano 25-11), toda escrita de login/logout/refresh-token/reset-de-senha/
+-- confirmacao-de-e-mail passa a rodar sob esse role -- sem este GRANT,
+-- LoginUseCase.Execute falhava com "permission denied for table
+-- refresh_tokens" (achado empirico rodando `make test` sob controlcar_app,
+-- GRANT_FIX_PATH da 25-11-PLAN.md).
+--
+-- Este GRANT e estritamente aditivo: nao cria role novo, nao concede
+-- BYPASSRLS, nao adiciona RLS a nenhuma tabela (nenhuma das duas jamais teve
+-- policy -- nao sao tenant-scoped, sao globais por design, chaveadas por
+-- user_id). O carve-out de RLS desta fase continua sendo exclusivamente a
+-- conexao platform (superusuario), nunca um grant de bypass.
+GRANT SELECT, INSERT, UPDATE, DELETE ON refresh_tokens, password_reset_tokens TO controlcar_app;

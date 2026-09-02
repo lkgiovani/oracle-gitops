@@ -34,6 +34,17 @@ configMapGenerator:
       - sql/V17__add_vehicle_documents_current_idx.sql
       - sql/V18__alter_client_requests.sql
       - sql/V19__alter_notifications_dedup.sql
+      # Multi-tenant v3.0 (Fases 20-25). A V21 exige o placeholder
+      # app_db_password e a V22 os placeholders platform_admin_* -- ambos
+      # adicionados ao flyway-job.yaml/controlcar-migration-secret junto com
+      # estes arquivos.
+      - sql/V20__multi_tenant_foundation.sql
+      - sql/V21__tenant_scope_rls.sql
+      - sql/V22__platform_admin_role.sql
+      - sql/V23__onboarding_pending_status.sql
+      - sql/V24__token_purpose.sql
+      - sql/V25__audit_actor_marker.sql
+      - sql/V26__app_role_auth_tables_grant.sql
 generatorOptions:
   disableNameSuffixHash: false
   # O Job Flyway é hook PreSync; o ConfigMap de SQL precisa existir ANTES dele.

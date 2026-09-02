@@ -20,6 +20,14 @@ spec:
             - -connectRetries=10
             - -placeholders.admin_email=$(SEED_ADMIN_EMAIL)
             - -placeholders.admin_password=$(SEED_ADMIN_PASSWORD)
+            # Multi-tenant v3.0: a V21 cria o role de aplicacao controlcar_app
+            # (nao-superusuario, sem BYPASSRLS) com esta senha, e a V22 seeda o
+            # platform_admin. Os tres valores vivem no controlcar-migration-secret
+            # (SOPS), como admin_email/admin_password desde a V16. Sem eles o
+            # Flyway falha ao resolver o placeholder e o hook PreSync trava.
+            - -placeholders.app_db_password=$(APP_DB_PASSWORD)
+            - -placeholders.platform_admin_email=$(SEED_PLATFORM_ADMIN_EMAIL)
+            - -placeholders.platform_admin_password=$(SEED_PLATFORM_ADMIN_PASSWORD)
             - migrate
           # Seed-admin (Pitfall 5) e credenciais de DB vivem SOMENTE neste
           # secret, dedicado ao Job efemero de migration - o Deployment de
