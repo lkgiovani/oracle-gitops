@@ -1,7 +1,7 @@
 fullnameOverride: controlcar-api
 image:
   repository: ghcr.io/lkgiovani/controlcar-api
-  tag: "0537fa5d6e43f7308ff50005a29ab2d520b67d83"
+  tag: "5e5b1e28dd53e02984909ad5d1a557b6530ecd0f"
   pullPolicy: Always
 service:
   port: 3000
